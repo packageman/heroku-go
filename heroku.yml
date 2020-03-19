@@ -8,4 +8,4 @@ release:
   image: web
 
 run:
-  web: go-getting-started
+  web: heroku-go
