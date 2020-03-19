@@ -1,6 +1,7 @@
 build:
   docker:
     web: Dockerfile
+    worker: Dockerfile
 
 release:
   command:
@@ -9,3 +10,4 @@ release:
 
 run:
   web: heroku-go
+  worker: worker
