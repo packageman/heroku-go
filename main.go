@@ -16,7 +16,6 @@ func main() {
 	if port == "" {
 		log.Fatal("$PORT must be set")
 	}
-	pool := newRedisPool()
 
 	router := gin.New()
 	router.Use(gin.Logger())
@@ -29,9 +28,12 @@ func main() {
 
 	router.GET("/enqueue/:job", func(c *gin.Context) {
 		job := c.Param("job")
-		conn := pool.Get()
+		conn, err := redis.DialURL(os.Getenv("REDIS_URL"))
+		if err != nil {
+			log.Printf("failed to get redis connection, err: %s", err.Error())
+		}
 		defer conn.Close()
-		_, err := conn.Do("RPUSH", "queue", job)
+		_, err = conn.Do("RPUSH", "queue", job)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "failed, error: %s", err.Error())
 		}
@@ -40,19 +42,4 @@ func main() {
 	})
 
 	router.Run(":" + port)
-}
-
-func newRedisPool() *redis.Pool {
-	redisUrl := os.Getenv("REDIS_URL")
-	return &redis.Pool{
-		MaxIdle:   5,
-		MaxActive: 10,
-		Dial: func() (redis.Conn, error) {
-			c, err := redis.DialURL(redisUrl)
-			if err != nil {
-				panic(err.Error())
-			}
-			return c, err
-		},
-	}
 }
