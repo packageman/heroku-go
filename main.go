@@ -38,7 +38,7 @@ func main() {
 			c.String(http.StatusInternalServerError, "failed, error: %s", err.Error())
 		}
 		log.Printf("enqueued job: %s", job)
-		c.String(http.StatusOK, "enqueued job: %s", job)
+		c.String(http.StatusOK, "enqueued a job: %s", job)
 	})
 
 	router.Run(":" + port)
